@@ -141,4 +141,3 @@ docker run -it --network none --shm-size 2G --name matching_object -v ./data:/ap
 ```
 
 However, please note that because all weights and libraries are downloaded during the container build, this process can be time-consuming.
-```

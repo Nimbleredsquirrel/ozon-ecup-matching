@@ -1,67 +1,68 @@
-# MISIS Neychev Loss 
+```markdown
+# MISIS Neychev Loss
 
-## Состав команды: 
-1) [**Груздев Александр**](https://github.com/gruzdev-as) - ML
-2) [**Рыжичкин Кирилл**](https://github.com/l1ghtsource) - ML
-3) [**Литвинов Максим**](https://github.com/maksimlitvinov39kg) - ML 
-4) [**Аксеновский Максим**](https://github.com/Solitum26) - ML
-5) [**Замышевская Арина**](https://github.com/Nimbleredsquirrel) - ML
+## Team:
+1) [**Alexander Gruzdev**](https://github.com/gruzdev-as) - ML
+2) [**Kirill Ryzhichkin**](https://github.com/l1ghtsource) - ML
+3) [**Maksim Litvinov**](https://github.com/maksimlitvinov39kg) - ML
+4) [**Maksim Aksenovskiy**](https://github.com/Solitum26) - ML
+5) [**Arina Zamyshevskaya**](https://github.com/Nimbleredsquirrel) - ML
 
-Презентация: [тык](https://drive.google.com/file/d/1-L61ooSwS0bSlZIfT1Uk5YO9XHGkVnjc/view?usp=sharing)
+Presentation: [link](https://drive.google.com/file/d/1-L61ooSwS0bSlZIfT1Uk5YO9XHGkVnjc/view?usp=sharing)
 
-## Описание решения 
+## Solution Description
 
-Итоговое решение представляет собой ансамбль из градиентных бустингов, обученных с применением признаков, полученных без использования моделей глубокого обучения и с использованием различных модификаций модели BERT. Для каждого тестового семпла делается два предсказания: 
+The final solution is an ensemble of gradient boosting models, trained using features generated both without deep learning models and with various modifications of the BERT model. For each test sample, two predictions are made:
 
-1) Предсказание от 5 моделей, которые обучались на всех тренировочных данных с различными сидами, чтобы исключить влияние рандома
-2) Предсказание от 5 моделей, которые обучались на данных из конкретной категории второго уровня с различными сидами  
+1) A prediction from 5 models trained on the entire training dataset with different random seeds to mitigate the effect of randomness.
+2) A prediction from 5 models trained on data from a specific second-level category with different random seeds.
 
-Итоговые предсказания моделей суммируются и усредняются, а после блендятся с весами $w_{full} = 0.6$ и $w_{categories} = 0.4$, получая финальное предсказание. 
-Каждая модель градиентного бустинга использует **109** признаков, из которых **106** признаков получены используя имеющиеся данные без использования моделей машинного обучения, как это продемонстрированно в файле [**generate_features_train.py**](generate_features_train.py), а **3** признака - OOF предсказания, полученные от дообученных open-source моделей.
+The final predictions from the models are summed, averaged, and then blended with weights $w_{full} = 0.6$ and $w_{categories} = 0.4$ to get the final prediction.
+Each gradient boosting model uses **109** features, of which **106** are generated from the available data without using machine learning models, as demonstrated in the [**generate_features_train.py**](generate_features_train.py) file. The remaining **3** features are Out-of-Fold (OOF) predictions obtained from fine-tuned open-source models.
 
 ![scheme](scheme.png)
 
-### Используемые Open-Source модели
+### Used Open-Source Models
 
 1) [**rubert-tiny-2**](https://huggingface.co/cointegrated/rubert-tiny2)
 2) [**distilbert-base-multilingual-cased**](https://huggingface.co/distilbert/distilbert-base-multilingual-cased)
 
-Модель **rubert-tiny-2** использовалась для генерации OOF признаков по атрибутам и по описаниям товара, соответственно. Модель **distilbert-base-multilingual-cased** использовалась для генерации OOF признаков только по атрибутам.
+The **rubert-tiny-2** model was used to generate OOF features from product attributes and descriptions, respectively. The **distilbert-base-multilingual-cased** model was used to generate OOF features from attributes only.
 
-Код обучения моделей и получения OOF предсказаний: [**тык**](bert_training.py)
+The code for training the models and obtaining OOF predictions can be found here: [**bert_training.py**](bert_training.py)
 
-Веса моделей, используемые для инференса: 
+Model weights used for inference:
 1) [**3epoch_768_name_attr_bert_full**](https://drive.google.com/file/d/1GEI0lEi1gitio-aKdn0fdAni-sHMhZlB/view?usp=drive_link)
 2) [**3epoch_1024_name_desc_bert_full**](https://drive.google.com/file/d/1vMe_znzoKJjUZ7gRRTQDpbch_5Nx98e6/view?usp=drive_link)
 3) [**multi512_attr_bert_full_second_epoch**](https://drive.google.com/file/d/1c9d03-pIwT5HJWfvEQ8PlxW5GtaEkuTB/view?usp=drive_link)
 
-Модели градиентного бустинга: 
-[Ссылка для скачивания](https://drive.google.com/drive/folders/1mktUxSWbg1YQHZXdSjQyBoSqwlD2pNdl?usp=drive_link)
+Gradient Boosting Models:
+[Download link](https://drive.google.com/drive/folders/1mktUxSWbg1YQHZXdSjQyBoSqwlD2pNdl?usp=drive_link)
 
-### Получение финальных моделей 
+### Training the Final Models
 
-Процедура обучения моделей градиентного бустинга описана в файле [**train_boosting_models.py**](train_boosting_models.py) для общей модели и для категориальных моделей. 
+The training procedure for the gradient boosting models is described in the [**train_boosting_models.py**](train_boosting_models.py) file for both the general model and the category-specific models.
 
-## Итоговый пайплайн для воспроизведения решения 
+## Final Pipeline for Reproducing the Solution
 
-В процессе хакатона командой использовались следующие ресурсы для обучения моделей и генерации признаков: 
-1) VK CLOUD SERVER, 128 Gb RAM 16 CPU Intel Ice Lake;
+During the hackathon, the team used the following resources for model training and feature generation:
+1) VK CLOUD SERVER, 128 Gb RAM, 16 CPU Intel Ice Lake;
 2) Kaggle GPU accelerated environment (P100);
-3) Персональные компьютеры (ПК) членов команды.
+3) Team members' personal computers (PCs).
 
-В связи с этим, для воспроизведения полного пайплайна рекомендуется убедиться, что ресурсов системы достаточно. Так как, например, во время генерации признаков на тренировочном датасете может сильно скакать потребление памяти и, следовательно, объем затраченного времени. 
+Therefore, to reproduce the full pipeline, it is recommended to ensure that your system has sufficient resources. For example, during feature generation on the training dataset, memory consumption can spike significantly, thus affecting the total time required.
 
-*Команда приносит свои извинения за то, что код не идеально оптимизирован, и занимает так много времени для генерации признаков для тренировки*
+*The team apologizes that the code is not perfectly optimized and that feature generation for the training set is time-consuming.*
 
-Чтобы воспроизвести решение: 
-1) Создайте виртуальное окружение, активируйте его и установите необходимые библиотеки
-    ```bash 
-        python -m venv venv
-        source venv/bin/cativate
-        pip install -r requirements.txt
+To reproduce the solution:
+1) Create a virtual environment, activate it, and install the required libraries.
+    ```bash
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
     ```
 
-2) Убедитесь, что в репозитории находится папка *data*, имеющая следующую структуру: 
+2) Ensure that the repository contains a *data* folder with the following structure:
     ```
     /project-root-folder
     ├── data
@@ -76,68 +77,69 @@
     │   │   ├── text_and_bert_test.parquet
     │   │   ├── resnet_test.parquet
     ```
-    
-2) Запустите файл [**generate_features_train.py**](generate_features_train.py)
-    1) Запустится генерация признаков на основе тренировочных данных (Файл [**generate_features_train.py**](generate_features_train.py), вызовет последовательно файлы [**data_preprocessing.py**](data_preprocessing.py) и [**feature_generation.py**](feature_generation.py))
-    2) Полученные паркеты с данными будут сохранены в *data/train/*. 
 
-3) Запустите файл [**bert_training.py**](bert_training.py)    
-    1) Запустится обучение open_source моделей 
-    2) Веса моделей будут сохранены в *models/BERT/*
+3) Run the [**generate_features_train.py**](generate_features_train.py) file.
+    1) This will start the feature generation process based on the training data (the [**generate_features_train.py**](generate_features_train.py) file will sequentially call [**data_preprocessing.py**](data_preprocessing.py) and [**feature_generation.py**](feature_generation.py)).
+    2) The resulting parquet files with data will be saved in *data/train/*.
 
-4) Запустите файл [**train_boosting_models.py**](train_boosting_models.py)
-    1) Запустится скрипт обучения моделей градиентного бустинга на основе ранее полученных паркетов
-    2) Полученные модели будут сохранены в *models/CATBOOST* (общая модель) и в *models/CATBOOST/categories* (модели для категорий)
+4) Run the [**bert_training.py**](bert_training.py) file.
+    1) This will start the training of the open-source models.
+    2) The model weights will be saved in *models/BERT/*.
 
-5) Запустите файл [**make_submission.py**](make_submission.py)
-    1) В папке *data* будет создан файл *submission.csv*, содержаший предсказания вероятностей для каждой пары из *test.parquet*
+5) Run the [**train_boosting_models.py**](train_boosting_models.py) file.
+    1) This will start the script for training the gradient boosting models on the previously generated parquet files.
+    2) The resulting models will be saved in *models/CATBOOST* (the general model) and *models/CATBOOST/categories* (the category-specific models).
 
-### Прочие файлы и папки, примечания
+6) Run the [**make_submission.py**](make_submission.py) file.
+    1) A file named *submission.csv* will be created in the *data* folder, containing the predicted probabilities for each pair from *test.parquet*.
 
-1) Для инференса через систему CI/CD веса моделей бустинга пушились прямо в репо, веса "тяжелых" моделей и обученные векторизаторы скачивались во время сборки docker контейнера. В связи с этим, для инференса можно скачать необходимые веса и модели напрямую. Также для локального инференса open_source моделей необходимо или скачать их базовые pretrained версии вручную по ссылкам, либо использовать команды: 
-```bash 
-    huggingface-cli download cointegrated/rubert-tiny2 --local-dir='./models/basemodel/rubert' && \ 
+### Other Files, Folders, and Notes
+
+1) For inference via the CI/CD system, the boosting model weights were pushed directly to the repository, while the weights of "heavy" models and trained vectorizers were downloaded during the Docker container build. Therefore, for inference, you can download the necessary weights and models directly. Also, for local inference of the open-source models, you need to either download their base pretrained versions manually from the links or use the following commands:
+```bash
+    huggingface-cli download cointegrated/rubert-tiny2 --local-dir='./models/basemodel/rubert' && \
     huggingface-cli download distilbert-base-multilingual-cased --local-dir='./models/basemodel/distilbert'
 ```
-Если команда выдает ошибку, то установите huggingface-cli 
-```bash 
+If the command fails, install `huggingface-cli`:
+```bash
     pip install huggingface-hub
 ```
 
-2) Папка *notebooks* содержит ноутубки, которые могут содержать куски кода для обучения признаков и/или моделей, которые не вошли в итоговое рещение. Они прикладываются исключительно с целью ознакомления и, скорее всего, могут содержать ошибки:
+2) The *notebooks* folder contains notebooks that may have code snippets for feature training and/or model training that were not included in the final solution. They are provided for informational purposes only and may contain errors:
 
-- [Exploratory Data Analysis](notebooks/0.%20Exploratory%20Data%20Analysis.ipynb) - содержит разведочный анализ данных
-- [Preprocessing & Feature Generation for Train](notebooks/1.1%20Preprocessing%20&%20Feature%20Generation%20for%20Train.ipynb) - генерация основных признаков для обучающей выборки
-- [Preprocessing & Feature Generation for Test](notebooks/1.2%20Preprocessing%20&%20Feature%20Generation%20for%20Test.ipynb) - генерация основных признаков для тестовой выборки
-- [Bert (Name + Attrs) OOF Predictions](notebooks/2.1%20Bert%20(Name%20+%20Attrs)%20OOF%20Predictions.ipynb) - получение OOF предсказаний BERT по атрибутам
-- [Bert (Name + Attrs) Full Training](notebooks/2.2%20Bert%20(Name%20+%20Attrs)%20Full%20Training.ipynb) - полное обучение модели BERT на атрибутах
-- [Bert (Name + Desc) OOF Predictions](notebooks/3.1%20Bert%20(Name%20+%20Desc)%20OOF%20Predictions.ipynb) - получение OOF предсказаний BERT по описаниям
-- [Bert (Name + Desc) Full Training](notebooks/3.2%20Bert%20(Name%20+%20Desc)%20Full%20Training.ipynb) - полное обучение модели BERT на описаниях
-- [Bert Inference](notebooks/4.%20Bert%20Inference.ipynb) - пример инференса BERT
-- [FastText Training](notebooks/%5BUNUSED%5D%20FastText%20Training.ipynb) - обучение FastText модели на описаниях
-- [Sampling from Train Dataset](notebooks/%5BUNUSED%5D%20Sampling%20from%20Train%20Dataset.ipynb) - сэмплирование выборки, похожей на тестовую по распределению категорий трёх уровней, из обучающей выборки
-- [Siamese Bert (Name + Attrs) Training](notebooks/%5BUNUSED%5D%20Siamese%20Bert%20(Name%20+%20Attrs)%20Training.ipynb) - обучение представлений для атрибутов товаров на примере сиамской нейросети
-- [Siamese Bert (Name + Desc) Training](notebooks/%5BUNUSED%5D%20Siamese%20Bert%20(Name%20+%20Desc)%20Training.ipynb) - обучение представлений для описаний товаров на примере сиамской нейросети
-- [Transitive Chains](notebooks/%5BUNUSED%5D%20Transitive%20Chains.ipynb) - расширение обучающей выборки с помощью транзитивных цепочек
+- [Exploratory Data Analysis](notebooks/0.%20Exploratory%20Data%20Analysis.ipynb) - Contains exploratory data analysis.
+- [Preprocessing & Feature Generation for Train](notebooks/1.1%20Preprocessing%20&%20Feature%20Generation%20for%20Train.ipynb) - Generation of main features for the training set.
+- [Preprocessing & Feature Generation for Test](notebooks/1.2%20Preprocessing%20&%20Feature%20Generation%20for%20Test.ipynb) - Generation of main features for the test set.
+- [Bert (Name + Attrs) OOF Predictions](notebooks/2.1%20Bert%20(Name%20+%20Attrs)%20OOF%20Predictions.ipynb) - Obtaining OOF predictions from BERT on attributes.
+- [Bert (Name + Attrs) Full Training](notebooks/2.2%20Bert%20(Name%20+%20Attrs)%20Full%20Training.ipynb) - Full training of the BERT model on attributes.
+- [Bert (Name + Desc) OOF Predictions](notebooks/3.1%20Bert%20(Name%20+%20Desc)%20OOF%20Predictions.ipynb) - Obtaining OOF predictions from BERT on descriptions.
+- [Bert (Name + Desc) Full Training](notebooks/3.2%20Bert%20(Name%20+%20Desc)%20Full%20Training.ipynb) - Full training of the BERT model on descriptions.
+- [Bert Inference](notebooks/4.%20Bert%20Inference.ipynb) - Example of BERT inference.
+- [[UNUSED] FastText Training](notebooks/%5BUNUSED%5D%20FastText%20Training.ipynb) - Training a FastText model on descriptions.
+- [[UNUSED] Sampling from Train Dataset](notebooks/%5BUNUSED%5D%20Sampling%20from%20Train%20Dataset.ipynb) - Sampling a subset from the training data that is similar to the test set in its distribution of three-level categories.
+- [[UNUSED] Siamese Bert (Name + Attrs) Training](notebooks/%5BUNUSED%5D%20Siamese%20Bert%20(Name%20+%20Attrs)%20Training.ipynb) - Training representations for product attributes using a Siamese neural network.
+- [[UNUSED] Siamese Bert (Name + Desc) Training](notebooks/%5BUNUSED%5D%20Siamese%20Bert%20(Name%20+%20Desc)%20Training.ipynb) - Training representations for product descriptions using a Siamese neural network.
+- [[UNUSED] Transitive Chains](notebooks/%5BUNUSED%5D%20Transitive%20Chains.ipynb) - Augmenting the training set using transitive chains.
 
-## Запуск через докер-контейнер 
+## Running via Docker Container
 
-Запустить решение возможно используя функционал docker. Для того, чтобы собрать образ решения выполните 
+It is possible to run the solution using Docker. To build the solution's image, run:
 
 ```bash
 docker build . -t matching_object
 ```
 
-После сборки контейнера вы можете запустить инференс используя команду 
+After building the container, you can run inference using the command:
 
-```bash 
+```bash
 docker run -it --network none --shm-size 2G --name matching_object -v ./data:/app/data matching_object python make_submission.py
 ```
 
-Также внутри докер контейнера есть возможность запускать другие .py файлы решения, используя, соответственно 
+You can also run other .py files from the solution inside the Docker container, like so:
 
-```bash 
-docker run -it --network none --shm-size 2G --name matching_object -v ./data:/app/data matching_object python {sciptname.py}
+```bash
+docker run -it --network none --shm-size 2G --name matching_object -v ./data:/app/data matching_object python {scriptname.py}
 ```
 
-Однако, в виду того, что при сборке контейнера скачиваются все веса и библиотеки, запуск может занимать много времени. 
+However, please note that because all weights and libraries are downloaded during the container build, this process can be time-consuming.
+```
